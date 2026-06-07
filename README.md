@@ -75,7 +75,7 @@ Add more in `voice_input.py` — see `COMMANDS`.
 
 ### Vocabulary
 
-Add proper nouns one-per-line to `vocab.txt`. After editing, restart VoiceInput (menubar → 終了 → relaunch). Whisper will favor these spellings.
+Edit `~/Library/Application Support/VoiceInput/vocab.txt`, one word per line. After editing, restart VoiceInput (menubar → 終了 → relaunch). Whisper will favor these spellings.
 
 ```
 # vocab.txt
@@ -113,11 +113,22 @@ After editing, copy the file into the bundle and relaunch (see **Updating** belo
 
 ### Optional: Groq API key
 
-If you want Groq fallback or Japanese polishing, get a key at [console.groq.com/keys](https://console.groq.com/keys) and put it in `.env`:
+If you want Groq fallback or Japanese polishing, get a key at [console.groq.com/keys](https://console.groq.com/keys) and put it in `~/Library/Application Support/VoiceInput/.env`:
 
 ```
 GROQ_API_KEY=gsk_...
 ```
+
+### Config locations
+
+| Path | Purpose |
+|:--|:--|
+| `~/Library/Application Support/VoiceInput/vocab.txt` | Proper-noun vocabulary list |
+| `~/Library/Application Support/VoiceInput/.env` | `GROQ_API_KEY=...` (optional) |
+| `~/Library/Application Support/VoiceInput/models/` | Whisper model file |
+| `~/Library/Application Support/VoiceInput/voice_input.log` | Runtime log |
+
+Override the location with `VOICEINPUT_CONFIG_DIR=/path/to/dir` if you want.
 
 ---
 

@@ -27,8 +27,15 @@ import rumps
 import Quartz
 from AppKit import NSPasteboard, NSPasteboardTypeString
 
-# ===== 設定（編集可。CONFIG_DIRは固定＝.app化しても効く）=====
-CONFIG_DIR = Path.home() / "bin" / "voice_input"
+# ===== Config (override with VOICEINPUT_CONFIG_DIR env var if you want) =====
+# Default: macOS Application Support dir. install.sh creates this and places
+# vocab.txt / .env / models there so the .app finds them regardless of where
+# the source repo lives.
+CONFIG_DIR = Path(os.environ.get(
+    "VOICEINPUT_CONFIG_DIR",
+    str(Path.home() / "Library" / "Application Support" / "VoiceInput")
+))
+CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 ENV_FILE = CONFIG_DIR / ".env"
 VOCAB_FILE = CONFIG_DIR / "vocab.txt"
 LOG_FILE = CONFIG_DIR / "voice_input.log"

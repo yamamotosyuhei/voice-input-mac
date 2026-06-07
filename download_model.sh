@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 # Downloads the Whisper model from HuggingFace.
 # Default: large-v3-turbo q5 (~512 MB) — fast and accurate.
+#
+# Destination is $MODELS_DIR if set, otherwise ./models next to this script.
+# install.sh sets MODELS_DIR to the app's config directory so the .app finds it.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MODELS_DIR="$SCRIPT_DIR/models"
+MODELS_DIR="${MODELS_DIR:-$SCRIPT_DIR/models}"
 MODEL_NAME="${MODEL_NAME:-ggml-large-v3-turbo-q5_0.bin}"
 URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/$MODEL_NAME"
 
@@ -22,7 +25,7 @@ if [[ -f "$DEST" ]]; then
   fi
 fi
 
-echo "↓ Downloading $MODEL_NAME (~512 MB)…"
+echo "↓ Downloading $MODEL_NAME (~512 MB) to $DEST"
 curl -L --fail --progress-bar -o "$DEST" "$URL"
 
 echo "✓ Model saved to $DEST"

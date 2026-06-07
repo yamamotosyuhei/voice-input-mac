@@ -9,6 +9,8 @@ APP_DEST="/Applications/${APP_NAME}.app"
 BUNDLE_ID="app.voiceinput"
 LAUNCH_AGENT_DIR="$HOME/Library/LaunchAgents"
 LAUNCH_AGENT_PLIST="$LAUNCH_AGENT_DIR/${BUNDLE_ID}.plist"
+CONFIG_DIR="$HOME/Library/Application Support/VoiceInput"
+VENV_DIR="$SCRIPT_DIR/.build-venv"
 
 cd "$SCRIPT_DIR"
 
@@ -31,40 +33,53 @@ for pkg in ffmpeg whisper-cpp; do
   fi
 done
 
-# ─── 2. Python dependencies ──────────────────────────────────────────────────
-say "Installing Python dependencies (rumps, pyobjc, py2app)"
-python3 -m pip install --quiet --user --upgrade rumps pyobjc py2app
+# ─── 2. Python build environment (venv — avoids PEP 668 errors) ──────────────
+say "Setting up Python build venv"
+if [[ ! -d "$VENV_DIR" ]]; then
+  python3 -m venv "$VENV_DIR"
+  ok "Created venv at $VENV_DIR"
+else
+  ok "Reusing existing venv"
+fi
+# shellcheck disable=SC1091
+source "$VENV_DIR/bin/activate"
+python -m pip install --quiet --upgrade pip
+python -m pip install --quiet rumps pyobjc py2app
+ok "Build dependencies ready"
 
-# ─── 3. Model ────────────────────────────────────────────────────────────────
-say "Downloading Whisper model"
-bash "$SCRIPT_DIR/download_model.sh"
-
-# ─── 4. Config files (only if user hasn't created them) ──────────────────────
-say "Preparing config files"
-if [[ ! -f "$SCRIPT_DIR/vocab.txt" ]]; then
-  cp "$SCRIPT_DIR/vocab.txt.example" "$SCRIPT_DIR/vocab.txt"
-  ok "Created vocab.txt from example"
+# ─── 3. Config directory ─────────────────────────────────────────────────────
+say "Preparing config directory at $CONFIG_DIR"
+mkdir -p "$CONFIG_DIR/models"
+if [[ ! -f "$CONFIG_DIR/vocab.txt" ]]; then
+  cp "$SCRIPT_DIR/vocab.txt.example" "$CONFIG_DIR/vocab.txt"
+  ok "Created $CONFIG_DIR/vocab.txt from example"
 else
   ok "vocab.txt already exists — left untouched"
 fi
-if [[ ! -f "$SCRIPT_DIR/.env" ]]; then
-  cp "$SCRIPT_DIR/.env.example" "$SCRIPT_DIR/.env"
-  ok "Created .env from example (Groq key is optional)"
+if [[ ! -f "$CONFIG_DIR/.env" ]]; then
+  cp "$SCRIPT_DIR/.env.example" "$CONFIG_DIR/.env"
+  ok "Created $CONFIG_DIR/.env from example (Groq key is optional)"
 else
   ok ".env already exists — left untouched"
 fi
 
-# ─── 5. Build .app ───────────────────────────────────────────────────────────
-say "Building ${APP_NAME}.app with py2app"
+# ─── 4. Whisper model ────────────────────────────────────────────────────────
+say "Downloading Whisper model into config dir"
+# download_model.sh saves to $CONFIG_DIR/models/ when MODELS_DIR is set
+MODELS_DIR="$CONFIG_DIR/models" bash "$SCRIPT_DIR/download_model.sh"
+
+# ─── 5. Build .app (standalone, not --alias, so the .app is self-contained) ──
+say "Building ${APP_NAME}.app with py2app (standalone)"
 if [[ -d "$SCRIPT_DIR/build" ]]; then mv "$SCRIPT_DIR/build" "$SCRIPT_DIR/build.old.$(date +%s)"; fi
 if [[ -d "$SCRIPT_DIR/dist"  ]]; then mv "$SCRIPT_DIR/dist"  "$SCRIPT_DIR/dist.old.$(date +%s)";  fi
-python3 setup.py py2app --alias --quiet
+python setup.py py2app --quiet
 
 BUILT_APP="$SCRIPT_DIR/dist/${APP_NAME}.app"
 if [[ ! -d "$BUILT_APP" ]]; then
   warn "Build failed — ${BUILT_APP} not found"
   exit 1
 fi
+deactivate
 
 # ─── 6. Install to /Applications ─────────────────────────────────────────────
 say "Installing to ${APP_DEST}"
@@ -126,8 +141,8 @@ menubar and relaunch — those two only take effect after restart.
 Try it: click into any text field, hold Fn, speak, release.
 
 Config files (edit and restart the app to apply):
-  - $SCRIPT_DIR/vocab.txt
-  - $SCRIPT_DIR/.env
+  - $CONFIG_DIR/vocab.txt
+  - $CONFIG_DIR/.env
 
 Quit anytime from menubar 🎤 → 終了.
 Uninstall:  see README.md → Uninstall section.

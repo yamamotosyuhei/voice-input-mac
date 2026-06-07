@@ -10,10 +10,14 @@ models/*.gguf
 # Build artifacts
 build/
 dist/
-dist.old_*/
+build.old.*/
+dist.old.*/
 *.egg-info/
 __pycache__/
 *.pyc
+
+# venv created by install.sh
+.build-venv/
 
 # macOS
 .DS_Store
