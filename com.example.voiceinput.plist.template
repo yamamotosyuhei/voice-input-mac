@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LaunchAgent template for auto-starting VoiceInput on login.
+
+  install.sh will generate the real plist from this template into:
+    ~/Library/LaunchAgents/app.voiceinput.plist
+
+  If you customize the Bundle ID in setup.py, change the <Label> below to match.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>app.voiceinput</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/open</string>
+        <string>-a</string>
+        <string>/Applications/VoiceInput.app</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>StandardErrorPath</key>
+    <string>/tmp/app.voiceinput.err</string>
+    <key>StandardOutPath</key>
+    <string>/tmp/app.voiceinput.out</string>
+</dict>
+</plist>

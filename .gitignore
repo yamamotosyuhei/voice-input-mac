@@ -1,0 +1,23 @@
+# Personal config — never commit
+.env
+vocab.txt
+
+# Runtime artifacts
+*.log
+models/*.bin
+models/*.gguf
+
+# Build artifacts
+build/
+dist/
+dist.old_*/
+*.egg-info/
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/

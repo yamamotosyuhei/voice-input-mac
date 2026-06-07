@@ -1,0 +1,12 @@
+# Vocabulary list to correct Whisper transcription mistakes.
+# One word per line. Lines starting with # are comments.
+# These are passed as a Whisper "prompt" so the model favors these spellings.
+#
+# Add words that Whisper consistently mishears — company names, project names,
+# product names, jargon, your own name, etc. After editing, restart the app.
+
+# --- Examples (delete these and add your own) ---
+# Anthropic
+# Whisper
+# whisper.cpp
+# Groq
